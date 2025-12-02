@@ -1,0 +1,34 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodları Çek (Checkout)
+        uses: actions/checkout@v3
+
+      - name: Python Kurulumu
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Poetry Kurulumu
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Bağımlılıkları Yükle
+        run: poetry install --no-interaction --no-root
+
+      - name: Lint Kontrolü (Ruff)
+        run: poetry run ruff check .
+
+      - name: Testleri Çalıştır
+        run: poetry run pytest
