@@ -1,0 +1,6 @@
+PROJE ADI: Nexus-Agent
+GELİŞTİRİCİ: Habip Okcu
+KURULUŞ YILI: 2025
+AÇIKLAMA: Nexus-Agent, Ubuntu üzerinde çalışan, tamamen yerel ve açık kaynaklı modeller kullanan, 
+dünyanın en hızlı yerel yapay zeka asistanı olma hedefiyle geliştirilmiş bir projedir. 
+Bu proje Llama 3.2 modelini ve ChromaDB veritabanını kullanır.
