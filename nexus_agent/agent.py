@@ -3,7 +3,7 @@ from langchain_ollama import ChatOllama
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+from langchain_core.messages import BaseMessage, SystemMessage
 
 from nexus_agent.tools import tools
 
@@ -32,14 +32,14 @@ def agent_node(state: AgentState):
     is_project_query = any(word in last_user_msg for word in project_keywords)
 
     if is_greeting:
-        print(f"   🛡️  ROUTER: Selamlaşma modu. (Tool Kapalı)")
+        print("   🛡️  ROUTER: Selamlaşma modu. (Tool Kapalı)")
         # Toolsuz prompt
         final_prompt = BASE_SYSTEM_PROMPT + "\nUser is greeting you. Reply warmly. DO NOT USE TOOLS."
         messages = [SystemMessage(content=final_prompt)] + state["messages"]
         response = llm.invoke(messages) # Toolsuz model
         
     elif is_project_query:
-        print(f"   🛡️  ROUTER: Proje sorusu tespit edildi. (Teknik DB Zorunlu)")
+        print("   🛡️  ROUTER: Proje sorusu tespit edildi. (Teknik DB Zorunlu)")
         # Prompt'a 'Enjeksiyon' yapıyoruz: ZORLA 'search_technical_db' KULLAN
         forced_prompt = BASE_SYSTEM_PROMPT + """
         CRITICAL: The user is asking about 'Nexus-Agent' (this specific project).
@@ -50,7 +50,7 @@ def agent_node(state: AgentState):
         response = llm_with_tools.invoke(messages) # Toollu model
         
     else:
-        print(f"   🛡️  ROUTER: Genel bilgi isteği. (Serbest Mod)")
+        print("   🛡️  ROUTER: Genel bilgi isteği. (Serbest Mod)")
         # Standart davranış
         messages = [SystemMessage(content=BASE_SYSTEM_PROMPT)] + state["messages"]
         response = llm_with_tools.invoke(messages)
