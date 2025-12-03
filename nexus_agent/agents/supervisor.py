@@ -1,8 +1,5 @@
-from typing import Literal
 from langchain_ollama import ChatOllama
 from langchain_core.messages import SystemMessage
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from pydantic import BaseModel, Field
 from nexus_agent.core.state import AgentState
 
 # Model Tanımı
