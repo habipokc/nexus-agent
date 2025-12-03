@@ -29,9 +29,12 @@ def rag_node(state: AgentState):
     print(f"   👀 [DEBUG RAG]: '{content}'")
     
     if "SEARCH:" in content.upper():
-        if "SEARCH:" in content: query = content.split("SEARCH:")[1].strip()
-        elif "Search:" in content: query = content.split("Search:")[1].strip()
-        else: query = content
+        if "SEARCH:" in content: 
+            query = content.split("SEARCH:")[1].strip()
+        elif "Search:" in content: 
+            query = content.split("Search:")[1].strip()
+        else: 
+            query = content
 
         print(f"   🧠 (RAG) Aranıyor: '{query}'")
         tool_result = rag_func.invoke(query)

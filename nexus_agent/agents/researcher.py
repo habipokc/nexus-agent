@@ -36,9 +36,12 @@ def researcher_node(state: AgentState):
     # "SEARCH:" veya "Search:" yakala
     if "SEARCH:" in content.upper():
         # Temizlik
-        if "SEARCH:" in content: query = content.split("SEARCH:")[1].strip()
-        elif "Search:" in content: query = content.split("Search:")[1].strip()
-        else: query = content # Fallback
+        if "SEARCH:" in content: 
+            query = content.split("SEARCH:")[1].strip()
+        elif "Search:" in content: 
+            query = content.split("Search:")[1].strip()
+        else: 
+            query = content # Fallback
         
         print(f"   🌍 (Wiki) Aranıyor: '{query}'")
         

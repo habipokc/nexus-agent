@@ -22,7 +22,8 @@ def main():
                 print("👋 Görüşürüz!")
                 break
             
-            if not user_input.strip(): continue
+            if not user_input.strip(): 
+                continue
 
             print("⏳ Çalışıyor...")
             inputs = {"messages": [HumanMessage(content=user_input)]}
@@ -31,7 +32,8 @@ def main():
                 for key, value in event.items():
                     # Mesajları al
                     messages = value.get("messages", [])
-                    if not messages: continue
+                    if not messages: 
+                        continue
                     
                     last_msg = messages[-1]
                     
