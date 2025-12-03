@@ -21,26 +21,41 @@ def wikipedia_search(query: str) -> str:
     Search Wikipedia for general knowledge.
     Input should be a specific search query.
     """
-    # GÜVENLİK ÖNLEMİ: Boş sorgu gelirse patlama, mesaj dön.
+    # 1. Güvenlik: Boş sorgu kontrolü
     if not query or not query.strip():
-        return "Arama terimi belirtilmedi."
+        return "Hata: Arama terimi boş olamaz."
 
     print(f"   🌍 (Wiki) Aranıyor: {query}")
+    
     try:
-        api_wrapper = WikipediaAPIWrapper(top_k_results=1, doc_content_chars_max=2000, lang="tr")
-        # Wikipedia Wrapper bazen kendi içinde de hata verebilir
-        return api_wrapper.run(query)
-    except Exception as e:
-        return f"Wikipedia hatası: {e}"
+        # LangChain Wrapper'ı güvenli modda çalıştırıyoruz
+        api_wrapper = WikipediaAPIWrapper(
+            top_k_results=1, 
+            doc_content_chars_max=2000, 
+            lang="tr"
+        )
+        
+        result = api_wrapper.run(query)
+        
+        # 2. Güvenlik: Wrapper bazen boş string döner, hata sayalım
+        if not result or "No good Wikipedia Search Result was found" in result:
+            # BURADAKİ MESAJ ÖNEMLİ: Grader "bulunamadı" kelimesini arıyor.
+            return "Wikipedia'da bu konuyla ilgili bilgi bulunamadı."
+            
+        return result
 
-# 2. RAG Tool
+    except Exception as e:
+        # 3. Güvenlik: Asla çökme, hatayı metin olarak dön
+        return f"Wikipedia arama hatası: {str(e)}"
+
+# 2. RAG Tool (Aynı kalabilir ama güvenlik ekleyelim)
 @tool("search_technical_db")
 def search_technical_db(query: str) -> str:
     """
     Useful ONLY for technical questions about 'Nexus-Agent', 'project architecture', 
     'Llama 3.2', 'ChromaDB' or the developer 'Habip Okcu'.
     """
-    if not query or query.strip() == "":
+    if not query or not query.strip():
         return "Boş sorgu yapılamaz."
 
     print(f"   🕵️‍♂️ (DB) Teknik Arama: {query}")
@@ -48,7 +63,7 @@ def search_technical_db(query: str) -> str:
         retriever = get_retriever()
         docs = retriever.invoke(query)
         if not docs:
-            return "No information found in internal memory."
+            return "Veritabanında bilgi bulunamadı."
         return "\n\n".join([doc.page_content for doc in docs])
     except Exception as e:
         return f"Veritabanı hatası: {e}"

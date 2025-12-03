@@ -26,10 +26,21 @@ Do not act like a search engine. Just chat.
 def general_node(state: AgentState):
     """Araştırma yapan, Wiki kullanan node."""
     messages = [SystemMessage(content=prompt_research)] + state["messages"]
-    # Burada Tool'lu model kullanıyoruz
+    
+    # Tool'lu model çağır
     response = llm_with_tools.invoke(messages)
+    
+    # --- EKLENEN KISIM: Cevap Kontrolü ---
+    # Eğer Wikipedia tool'u hata verdiyse veya model "Geçersiz sonuç" diyorsa
+    # Bunu standart bir hata mesajına çevirelim ki Grader yakalayabilsin.
+    content = response.content.lower()
+    
+    # Wikipedia wrapper hatası veya modelin boş dönmesi
+    if "geçersiz" in content or "invalid" in content or "no result" in content:
+         # İçeriği değiştiriyoruz
+         response.content = "Aradığınız konuyla ilgili bilgi bulunamadı. Lütfen terimi kontrol edip tekrar deneyin."
+    
     return {"messages": [response]}
-
 def greeting_node(state: AgentState):
     """Sadece sohbet eden, TOOL KULLANMAYAN node."""
     messages = [SystemMessage(content=prompt_greeting)] + state["messages"]

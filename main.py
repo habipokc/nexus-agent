@@ -1,56 +1,58 @@
 import sys
-import io
+# Encoding zorlamalarını kaldırıyoruz, Python 3.12 native halletsin.
+# Sadece path eklemesi kalsın.
+sys.path.append(".")
+
 import warnings
 from langchain_core.messages import HumanMessage
 from nexus_agent.agent import graph
 
-# 1. UTF-8 Zorlaması
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-sys.stdin = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
-
 warnings.filterwarnings("ignore")
 
 def main():
-    print("🤖 Nexus-Agent v4.1 (Selamlaşma Fix) Başlatıldı")
-    print("-----------------------------------------------")
+    print("🤖 Nexus-Agent vFinal (Week 2 Complete) Başlatıldı")
+    print("--------------------------------------------------")
     print("Çıkış için 'q' yazın.\n")
     
     while True:
         try:
+            # Standart input kullanımı
             user_input = input("👤 Sen: ")
+            
             if user_input.lower() in ["q", "exit"]:
                 print("👋 Görüşürüz!")
                 break
             
-            if not user_input.strip(): 
-                continue
+            if not user_input.strip(): continue
 
             print("⏳ Çalışıyor...")
-            inputs = {"messages": [HumanMessage(content=user_input)]}
             
-            for event in graph.stream(inputs):
+            # State başlatma
+            initial_state = {
+                "messages": [HumanMessage(content=user_input)],
+                "sender": "user"
+            }
+            
+            for event in graph.stream(initial_state):
                 for key, value in event.items():
-                    # Mesajları al
-                    messages = value.get("messages", [])
-                    if not messages: 
-                        continue
-                    
-                    last_msg = messages[-1]
-                    
-                    if key == "tools":
-                        print("   ✅  Tool Verisi Alındı.")
+                    if "messages" in value:
+                        last_msg = value["messages"][-1]
                         
-                    # DÜZELTME BURADA: "greeting_agent" EKLENDİ!
-                    elif key in ["tech_agent", "general_agent", "greeting_agent"]:
+                        # Tool logu
+                        if hasattr(last_msg, 'tool_calls') and last_msg.tool_calls:
+                            print(f"   ⚙️  {key.upper()} -> Tool Çağırıyor: {last_msg.tool_calls[0]['name']}")
                         
-                        # Tool çağrısı var mı?
-                        if last_msg.tool_calls:
-                            tool_name = last_msg.tool_calls[0]['name']
-                            print(f"   ⚙️  {key.upper()} -> Tool Çağırıyor: {tool_name}")
-                        else:
-                            # Cevap geldi
-                            print(f"\n🤖 {key.upper()}: {last_msg.content}\n")
+                        # Ajan cevabı
+                        elif key in ["tech_agent", "general_agent", "greeting_agent"]:
+                            if last_msg.content.strip():
+                                print(f"\n🤖 {key.upper()}: {last_msg.content}\n")
 
+                    if key == "tools":
+                        print("   ✅  Tool Verisi İşlendi.")
+
+        except KeyboardInterrupt:
+            print("\n👋 İşlem iptal edildi.")
+            break
         except Exception as e:
             print(f"❌ Hata: {e}")
 
