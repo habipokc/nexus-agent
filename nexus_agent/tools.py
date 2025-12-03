@@ -3,37 +3,38 @@ from langchain_community.utilities import WikipediaAPIWrapper
 from langchain_core.tools import tool
 from nexus_agent.rag import get_retriever
 
-# --- 1. Wikipedia Tool ---
-# Wikipedia'yı ayarlıyoruz (lang: 'tr' yaparak Türkçe arama yapmasını sağlıyoruz)
-api_wrapper = WikipediaAPIWrapper(top_k_results=1, doc_content_chars_max=1000, lang="tr")
+# 1. Wikipedia Tool
+# Karakter limitini 2000'e çıkardık ki bilgi yarım kalıp model uydurmasın.
+api_wrapper = WikipediaAPIWrapper(top_k_results=1, doc_content_chars_max=2000, lang="tr")
 wiki_tool = WikipediaQueryRun(api_wrapper=api_wrapper)
 
-# Tool'un ismini ve açıklamasını netleştirelim (Model buna bakarak seçecek)
 wiki_tool.name = "wikipedia_search"
-wiki_tool.description = "Genel kültür, tarih, kişiler veya internetteki güncel bilgiler hakkında arama yapmak için kullanılır."
+wiki_tool.description = """
+Useful for searching historical figures, events, general knowledge, or facts.
+Input should be a specific search query (e.g., 'Ataturk', 'Quantum Physics').
+DO NOT use for greetings like 'merhaba', 'nasılsın'.
+"""
 
-# --- 2. RAG (Hafıza) Tool ---
-# Kendi hafızamızı da bir tool olarak tanımlıyoruz.
-# @tool dekoratörü, Python fonksiyonunu LLM'in anlayacağı bir araca çevirir.
+# 2. RAG Tool
+@tool("search_technical_db")
+def search_technical_db(query: str) -> str:
+    """
+    Useful ONLY for technical questions about 'Nexus-Agent', 'project architecture', 
+    'Llama 3.2', 'ChromaDB' or the developer 'Habip Okcu'.
+    Input should be a specific question.
+    """
+    # Boş sorgu gelirse hata vermesin, uyaralım.
+    if not query or query.strip() == "":
+        return "Boş sorgu yapılamaz."
 
-@tool
-def retrieve_knowledge(query: str) -> str:
-    """
-    Nexus-Agent projesi, teknik detaylar, kullanılan teknolojiler veya
-    proje geliştiricisi hakkında bilgi gerektiğinde bu aracı kullan.
-    """
-    print(f"🕵️‍♂️ Hafıza taranıyor: {query}")
+    print(f"🕵️‍♂️ Technical DB Search: {query}")
     retriever = get_retriever()
     
-    # Retriever doküman listesi döndürür, biz bunu tek bir metne çevirelim
     docs = retriever.invoke(query)
     
     if not docs:
-        return "Hafızada bu konuyla ilgili bilgi bulunamadı."
+        return "No information found in internal memory."
         
-    # Bulunan dokümanları birleştir
     return "\n\n".join([doc.page_content for doc in docs])
 
-# --- Tool Listesi ---
-# Ajanımıza vereceğimiz alet çantası
-tools = [wiki_tool, retrieve_knowledge]
+tools = [wiki_tool, search_technical_db]
