@@ -2,7 +2,7 @@ from langchain_core.messages import HumanMessage
 from nexus_agent.agent import graph
 import warnings
 
-# Gereksiz uyarıları kapat
+#  Gereksiz uyarıları kapat
 warnings.filterwarnings("ignore")
 
 def main():
