@@ -36,9 +36,12 @@ def router_logic(state: AgentState) -> Literal["tech_agent", "general_agent", "g
     last_message = messages[-1]
     decision = classify_user_input(last_message.content)
     
-    if decision == "tech": return "tech_agent"
-    elif decision == "greeting": return "greeting_agent"
-    else: return "general_agent"
+    if decision == "tech": 
+        return "tech_agent"
+    elif decision == "greeting": 
+        return "greeting_agent"
+    else: 
+        return "general_agent"
 
 def agent_router(state: AgentState) -> Literal["tools", "grader", END]:
     """

@@ -23,7 +23,8 @@ def main():
                 print("👋 Görüşürüz!")
                 break
             
-            if not user_input.strip(): continue
+            if not user_input.strip():
+                continue
 
             print("⏳ Çalışıyor...")
             
