@@ -1,4 +1,3 @@
-```markdown
 # 🤖 Nexus-Agent
 
 > **Fully Local, Autonomous AI Agent with RAG & Self-Reflection Capabilities.**
@@ -8,7 +7,7 @@
 ![Model](https://img.shields.io/badge/Model-Llama_3.2-green)
 ![Backend](https://img.shields.io/badge/Backend-FastAPI-teal)
 ![Frontend](https://img.shields.io/badge/Frontend-Streamlit-red)
-![License](https://img.shields.io/badge/License-MIT-grey)
+
 
 **Nexus-Agent** is an intelligent conversational assistant designed to run **100% locally** on Ubuntu Linux. It leverages the lightweight **Llama 3.2 3B** model via Ollama and orchestrates a multi-agent workflow using **LangGraph**. The system features a hybrid router, local RAG (Retrieval-Augmented Generation) for technical knowledge, Wikipedia integration for general queries, and a self-correction mechanism to ensure response quality.
 
@@ -44,6 +43,7 @@ nexus-agent/
 ├── chroma_db/          # Local Vector Database (Persisted)
 ├── pyproject.toml      # Poetry Dependency Management
 └── README.md           # Documentation
+
 ```
 
 ---
@@ -62,7 +62,7 @@ nexus-agent/
 Clone the repository and install dependencies using Poetry:
 
 ```bash
-git clone https://github.com/yourusername/nexus-agent.git
+git clone https://github.com/habip-okc/nexus-agent.git
 cd nexus-agent
 
 # Install dependencies
@@ -121,4 +121,3 @@ poetry run ruff check .
 
 # Run Unit Tests
 poetry run pytest
-```
