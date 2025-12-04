@@ -8,6 +8,7 @@ from nexus_agent.tools import tools
 from nexus_agent.agents.technical import tech_node
 from nexus_agent.agents.general import general_node, greeting_node
 from nexus_agent.agents.grader import grader_node
+from langgraph.checkpoint.memory import MemorySaver
 
 # --- YARDIMCI FONKSİYONLAR (NODES) ---
 
@@ -103,4 +104,6 @@ builder.add_conditional_edges("tools", tool_router)
 # 5. Grader -> Bitiş
 builder.add_conditional_edges("grader", grader_router)
 
-graph = builder.compile()
+memory = MemorySaver()
+
+graph = builder.compile(checkpointer=memory)

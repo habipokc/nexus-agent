@@ -24,6 +24,10 @@ def wikipedia_search(query: str) -> str:
     # 1. Güvenlik: Boş sorgu kontrolü
     if not query or not query.strip():
         return "Hata: Arama terimi boş olamaz."
+    
+    # Anlamsız harf yığınlarını (gibberish) basitçe elemek için:
+    if len(query) < 3:
+         return "Arama terimi çok kısa."
 
     print(f"   🌍 (Wiki) Aranıyor: {query}")
     
@@ -35,18 +39,33 @@ def wikipedia_search(query: str) -> str:
             lang="tr"
         )
         
+        # Kütüphane hatasını engellemek için doğrudan try-except bloğunda çalıştırıyoruz
         result = api_wrapper.run(query)
         
-        # 2. Güvenlik: Wrapper bazen boş string döner, hata sayalım
-        if not result or "No good Wikipedia Search Result was found" in result:
-            # BURADAKİ MESAJ ÖNEMLİ: Grader "bulunamadı" kelimesini arıyor.
+        # 2. Güvenlik: Wrapper bazen boş string döner
+        if not result:
             return "Wikipedia'da bu konuyla ilgili bilgi bulunamadı."
-            
+        
+        # 3. Güvenlik: Kütüphane bazen hata mesajını string olarak döner
+        if "No good Wikipedia Search Result was found" in result:
+             return "Wikipedia'da bu konuyla ilgili bilgi bulunamadı."
+        
+        # 4. Kütüphanenin o spesifik hatasını (srsearch) string içinde yakala
+        if "srsearch" in result.lower():
+            return "Arama terimi geçersiz."
+
         return result
 
     except Exception as e:
-        # 3. Güvenlik: Asla çökme, hatayı metin olarak dön
-        return f"Wikipedia arama hatası: {str(e)}"
+        # 5. Güvenlik: Ne olursa olsun (Kütüphane çökse bile) string dön!
+        # Hatayı loglayalım ama kullanıcıya çökme yaşatmayalım.
+        error_msg = str(e)
+        print(f"   ⚠️  WIKI HATASI: {error_msg}")
+        
+        if "srsearch" in error_msg:
+             return "Aranan terim Wikipedia indeksinde bulunamadı veya geçersiz."
+             
+        return f"Wikipedia arama hatası oluştu: {error_msg}"
 
 # 2. RAG Tool (Aynı kalabilir ama güvenlik ekleyelim)
 @tool("search_technical_db")
